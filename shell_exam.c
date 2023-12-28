@@ -96,7 +96,9 @@ void execArgsPiped(char** parsed, char** parsedpipe)
 		// Child 1 executing.. 
 		// It only needs to write at the write end 
 		close(pipefd[0]); 
-		dup2(pipefd[1], STDOUT_FILENO); 
+		dup2(pipefd[1], STDOUT_FILENO); //Hàm này được sử dụng để sao chép các bộ mô tả tệp. Nó nhận hai đối số: bộ mô tả tệp nguồn và bộ mô tả tệp đích. Sau lệnh gọi dup2, bộ mô tả tệp đích sẽ tham chiếu đến cùng một tệp hoặc tài nguyên với bộ mô tả tệp nguồn.
+		// dầu ra tiêu chuẩn (STDOUT_FILENO) được chuyển hướng đến đầu ghi của ống (pipefd[1]), 
+		//Sau khi dòng này thực thi, mọi thứ được ghi vào đầu ra tiêu chuẩn (ví dụ: sử dụng printf hoặc write(stdout_fd, ...)) sẽ thực sự được ghi vào đầu ghi của ống.
 		close(pipefd[1]); 
 
 		if (execvp(parsed[0], parsed) < 0) { 
@@ -117,6 +119,7 @@ void execArgsPiped(char** parsed, char** parsedpipe)
 		if (p2 == 0) { 
 			close(pipefd[1]); 
 			dup2(pipefd[0], STDIN_FILENO); 
+			//sau khi dong này thực thi, mọi thứ được đọc từ đầu vào tiêu chuẩn sẽ thực sự đọc từ đầu đọc của pipe (pipefd[0])
 			close(pipefd[0]); 
 			if (execvp(parsedpipe[0], parsedpipe) < 0) { 
 				printf("\nCould not execute command 2.."); 
