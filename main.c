@@ -13,9 +13,10 @@
 
 
 char input[50];
-char *test[] = {"ls","-l",NULL};
+//char *test[] = {"ls","-l",NULL};
 char *command1[10] = {"ps", "-aux"};
 char *command2[10] = {"grep", "test"};
+char *test[5];
 
 void init()
 {
@@ -74,6 +75,19 @@ void runsinglecommad(char *str[])
     else{
         printf("ERROR\n");
         return ;
+    }
+}
+
+void process_singlecommand(char *command, char **str)
+{
+    int i = 0;
+    char *token = strtok(command, " ");
+    while (token != NULL)
+    {
+        str[i] = token;
+        i++;
+        token = strtok(NULL, " ");
+
     }
 }
 
@@ -139,9 +153,11 @@ int main()
 {
     init();
     takeInput(input);
+    process_singlecommand(input,test);
+    printf("%s\n%s\n%s\n",test[0], test[1], test[2]);
     printfCurDir();
-    runsinglecommad(test);
-    rundoublecommand(command1, command2);
+    //runsinglecommad(test);
+    //rundoublecommand(command1, command2);
    
     return 0;
 }
