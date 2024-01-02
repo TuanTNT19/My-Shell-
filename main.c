@@ -14,8 +14,8 @@
 
 char input[50];
 //char *test[] = {"ls","-l",NULL};
-char *command1[10] = {"ps", "-aux"};
-char *command2[10] = {"grep", "test"};
+char *command1[10];
+char *command2[10] ;
 char *test[5];
 
 void init()
@@ -78,6 +78,27 @@ void runsinglecommad(char *str[])
     }
 }
 
+int process_doublecommand(char *command, char **str)
+{
+    int i = 0;
+    char *token = strtok(command, "|");
+    while (token != NULL)
+    {
+        str[i] = token;
+        i++;
+        token = strtok(NULL, "|");
+
+    }
+    if (str[1] == NULL)
+    {
+        return 0;
+    }
+    else{
+        return 1;
+    }
+
+}
+
 void process_singlecommand(char *command, char **str)
 {
     int i = 0;
@@ -89,6 +110,27 @@ void process_singlecommand(char *command, char **str)
         token = strtok(NULL, " ");
 
     }
+}
+
+int process_input(char *input, char **command1, char **command2)
+{
+    int check ;
+    char *str[2];
+    
+    check = process_doublecommand(input, str);
+    
+    if (check)
+    {
+        process_singlecommand(str[0], command1);
+        process_singlecommand(str[1], command2);
+        return 2;
+    }
+    else{
+        process_singlecommand(str[0], command1);
+        return 1;
+
+    }
+
 }
 
 void rundoublecommand(char **command1, char **command2)
@@ -151,11 +193,23 @@ void rundoublecommand(char **command1, char **command2)
 
 int main()
 {
+    int c ;
     init();
     takeInput(input);
-    process_singlecommand(input,test);
-    printf("%s\n%s\n%s\n",test[0], test[1], test[2]);
+    //process_singlecommand(input,test);
+    //printf("%s\n%s\n%s\n",test[0], test[1], test[2]);
+    // process_doublecommand(input, test);
+    // printf("%s\n%s\n",test[0], test[1]);
     printfCurDir();
+    c = process_input(input, command1, command2);
+    
+    if (c == 1)
+    {
+        runsinglecommad(command1);
+    }
+    else{
+        rundoublecommand(command1, command2);
+    }
     //runsinglecommad(test);
     //rundoublecommand(command1, command2);
    
