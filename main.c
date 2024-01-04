@@ -89,7 +89,7 @@ int process_doublecommand(char *command, char **str)
         token = strtok(NULL, "|");
 
     }
-    if (str[1] == NULL)
+    if (i == 1)
     {
         return 0;
     }
@@ -137,6 +137,7 @@ void rundoublecommand(char **command1, char **command2)
 {
     pid_t pid1, pid2;
     int fds[2];
+    int status;
 
     if (pipe(fds) < 0)
     {
@@ -184,8 +185,13 @@ void rundoublecommand(char **command1, char **command2)
             }
         }
         else{
-            wait(NULL);
-            wait(NULL);
+            close(fds[0]);
+            close(fds[1]);
+
+            waitpid(pid1, &status, 0);
+            waitpid(pid2, &status, 0);
+
+            return ;
         }
     }
 }
@@ -195,6 +201,8 @@ int main()
 {
     int c ;
     init();
+    while(1)
+    {
     takeInput(input);
     //process_singlecommand(input,test);
     //printf("%s\n%s\n%s\n",test[0], test[1], test[2]);
@@ -209,6 +217,7 @@ int main()
     }
     else{
         rundoublecommand(command1, command2);
+    }
     }
     //runsinglecommad(test);
     //rundoublecommand(command1, command2);

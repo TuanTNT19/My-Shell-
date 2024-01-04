@@ -71,6 +71,7 @@ void execArgs(char** parsed)
 	} else { 
 		// waiting for child to terminate 
 		wait(NULL); 
+		printf("wait p1\n");
 		return; 
 	} 
 } 
@@ -78,59 +79,66 @@ void execArgs(char** parsed)
 // Function where the piped system commands is executed 
 void execArgsPiped(char** parsed, char** parsedpipe) 
 { 
-	// 0 is read end, 1 is write end 
-	int pipefd[2]; 
-	pid_t p1, p2; 
+	
 
-	if (pipe(pipefd) < 0) { 
-		printf("\nPipe could not be initialized"); 
-		return; 
-	} 
-	p1 = fork(); 
-	if (p1 < 0) { 
-		printf("\nCould not fork"); 
-		return; 
-	} 
+    int pipefd[2];
+    pid_t p1, p2;
+    int status;
 
-	if (p1 == 0) { 
-		// Child 1 executing.. 
-		// It only needs to write at the write end 
-		close(pipefd[0]); 
-		dup2(pipefd[1], STDOUT_FILENO); //Hàm này được sử dụng để sao chép các bộ mô tả tệp. Nó nhận hai đối số: bộ mô tả tệp nguồn và bộ mô tả tệp đích. Sau lệnh gọi dup2, bộ mô tả tệp đích sẽ tham chiếu đến cùng một tệp hoặc tài nguyên với bộ mô tả tệp nguồn.
-		// dầu ra tiêu chuẩn (STDOUT_FILENO) được chuyển hướng đến đầu ghi của ống (pipefd[1]), 
-		//Sau khi dòng này thực thi, mọi thứ được ghi vào đầu ra tiêu chuẩn (ví dụ: sử dụng printf hoặc write(stdout_fd, ...)) sẽ thực sự được ghi vào đầu ghi của ống.
-		close(pipefd[1]); 
+    if (pipe(pipefd) < 0) {
+        perror("Pipe could not be initialized");
+        return;
+    }
 
-		if (execvp(parsed[0], parsed) < 0) { 
-			printf("\nCould not execute command 1.."); 
-			exit(0); 
-		} 
-	} else { 
-		// Parent executing 
-		p2 = fork(); 
+    p1 = fork();
+    if (p1 < 0) {
+        perror("Could not fork");
+        return;
+    }
 
-		if (p2 < 0) { 
-			printf("\nCould not fork"); 
-			return; 
-		} 
+    if (p1 == 0) {
+        // Child 1 executing..
+        // It only needs to write at the write end
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
 
-		// Child 2 executing.. 
-		// It only needs to read at the read end 
-		if (p2 == 0) { 
-			close(pipefd[1]); 
-			dup2(pipefd[0], STDIN_FILENO); 
-			//sau khi dong này thực thi, mọi thứ được đọc từ đầu vào tiêu chuẩn sẽ thực sự đọc từ đầu đọc của pipe (pipefd[0])
-			close(pipefd[0]); 
-			if (execvp(parsedpipe[0], parsedpipe) < 0) { 
-				printf("\nCould not execute command 2.."); 
-				exit(0); 
-			} 
-		} else { 
-			// parent executing, waiting for two children 
-			wait(NULL); 
-			wait(NULL); 
-		} 
-	} 
+        if (execvp(parsed[0], parsed) < 0) {
+            perror("Could not execute command 1..");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        // Parent executing
+        p2 = fork();
+
+        if (p2 < 0) {
+            perror("Could not fork");
+            return;
+        }
+
+        if (p2 == 0) {
+            // Child 2 executing..
+            // It only needs to read at the read end
+            close(pipefd[1]);
+            dup2(pipefd[0], STDIN_FILENO);
+            close(pipefd[0]);
+
+            if (execvp(parsedpipe[0], parsedpipe) < 0) {
+                perror("Could not execute command 2..");
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            // Parent process
+            close(pipefd[0]);
+            close(pipefd[1]);
+
+            // Wait for both child processes
+            waitpid(p1, &status, 0);
+            waitpid(p2, &status, 0);
+
+            exit(EXIT_SUCCESS);
+        }
+    }
 } 
 
 // Help command builtin 
