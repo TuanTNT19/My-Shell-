@@ -1,6 +1,9 @@
+ 
 build:
-	gcc -o main main.c -lreadline 
+	gcc -o runfile main.c -lreadline
 run:
-	./main
+	./runfile
 clean:
-	rm -rf main
+	rm -rf runfile
+
+

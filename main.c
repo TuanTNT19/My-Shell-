@@ -1,5 +1,4 @@
 
-// C Program to design a shell in Linux 
 #include<stdio.h> 
 #include<string.h> 
 #include<stdlib.h> 
@@ -11,13 +10,12 @@
 
 #define clear() printf("\033[H\033[J") 
 
-
 char input[50];
-//char *test[] = {"ls","-l",NULL};
-char *command1[10];
-char *command2[10] ;
-char *test[5];
+char check_ending[10] = "exit";
+char *command1[100];
+char *command2[100] ;
 
+//Starting shell
 void init()
 {
     char *username ;
@@ -31,10 +29,11 @@ void init()
 
 }
 
+//take input and store it to str
 int takeInput(char* str)
 {
     char* buf;
-    buf = readline("\n>> ");
+    buf = readline("\nTuanTNT19% >> ");
     if (strlen(buf) != 0)
     {
         add_history(buf);
@@ -46,13 +45,15 @@ int takeInput(char* str)
     }
 }
 
+//Display current Dictory
 void printfCurDir()
 {
     char dir[1000];
     getcwd(dir, sizeof(dir));
-    printf("%s\n",dir);
+    printf("Current_Dictory: %s ",dir);
 }
 
+//Funstion to run single command
 void runsinglecommad(char *str[])
 {
     pid_t child_pid;
@@ -78,61 +79,7 @@ void runsinglecommad(char *str[])
     }
 }
 
-int process_doublecommand(char *command, char **str)
-{
-    int i = 0;
-    char *token = strtok(command, "|");
-    while (token != NULL)
-    {
-        str[i] = token;
-        i++;
-        token = strtok(NULL, "|");
-
-    }
-    if (i == 1)
-    {
-        return 0;
-    }
-    else{
-        return 1;
-    }
-
-}
-
-void process_singlecommand(char *command, char **str)
-{
-    int i = 0;
-    char *token = strtok(command, " ");
-    while (token != NULL)
-    {
-        str[i] = token;
-        i++;
-        token = strtok(NULL, " ");
-
-    }
-}
-
-int process_input(char *input, char **command1, char **command2)
-{
-    int check ;
-    char *str[2];
-    
-    check = process_doublecommand(input, str);
-    
-    if (check)
-    {
-        process_singlecommand(str[0], command1);
-        process_singlecommand(str[1], command2);
-        return 2;
-    }
-    else{
-        process_singlecommand(str[0], command1);
-        return 1;
-
-    }
-
-}
-
+//Function to run double command
 void rundoublecommand(char **command1, char **command2)
 {
     pid_t pid1, pid2;
@@ -155,7 +102,7 @@ void rundoublecommand(char **command1, char **command2)
     else if (pid1 == 0)
     {
         close(fds[0]);
-        dup2(fds[1], STDOUT_FILENO);
+        dup2(fds[1], STDOUT_FILENO);//redirects the standard output to whatever file or resource is associated with the file descriptor at index 1 in the fds array.
         close(fds[1]);
 
         if (execvp(command1[0], command1) < 0){
@@ -175,7 +122,7 @@ void rundoublecommand(char **command1, char **command2)
         else if (pid2 == 0)
         {
             close(fds[1]);
-            dup2(fds[0], STDIN_FILENO);
+            dup2(fds[0], STDIN_FILENO); //redirects the standard input to whatever file or resource is associated with the file descriptor at index 1 in the fds array.
             close(fds[0]);
 
             if (execvp(command2[0], command2) < 0)
@@ -188,11 +135,94 @@ void rundoublecommand(char **command1, char **command2)
             close(fds[0]);
             close(fds[1]);
 
+            // Wait for both child processes
             waitpid(pid1, &status, 0);
             waitpid(pid2, &status, 0);
 
             return ;
         }
+    }
+}
+
+//function to process string double command
+int process_doublecommand(char *command, char **str)
+{
+    int i = 0;
+    char *token = strtok(command, "|");
+    while (token != NULL)
+    {
+        str[i] = token;
+        i++;
+        token = strtok(NULL, "|");
+
+    }
+    
+    if (i == 1)
+    {
+        return 0;
+    }
+    else{
+        return 1;
+    }
+
+}
+
+//function to process strong single command
+void process_singlecommand(char *command, char **str)
+{
+    int i = 0;
+    char *token = strtok(command, " ");
+    while (token != NULL)
+    {
+        str[i] = token;
+        i++;
+        token = strtok(NULL, " ");
+
+    }
+}
+
+//process input to command1 and command2
+int process_input(char *input, char **command1, char **command2)
+{
+    int check ;
+    char *str[2];
+    
+    check = process_doublecommand(input, str);
+    
+    if (check)//if input is double command
+    {
+        process_singlecommand(str[0], command1);
+        process_singlecommand(str[1], command2);
+        return 2;
+    }
+
+    else//if input is single command
+    {
+        process_singlecommand(str[0], command1);
+        return 1;
+
+    }
+
+}
+
+//Function to ending
+int ending(char *str1, char *str_check)
+{
+    if (strcmp(str1, str_check) == 0)
+    {
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+//Clear memory for string command
+void free_mem_command(char **command)
+{
+    for (int i=0; i<100; i++)
+    {
+        command[i] = NULL;
     }
 }
     
@@ -201,16 +231,19 @@ int main()
 {
     int c ;
     init();
+
     while(1)
     {
-    takeInput(input);
-    //process_singlecommand(input,test);
-    //printf("%s\n%s\n%s\n",test[0], test[1], test[2]);
-    // process_doublecommand(input, test);
-    // printf("%s\n%s\n",test[0], test[1]);
     printfCurDir();
+    takeInput(input);
     c = process_input(input, command1, command2);
     
+    if (ending(input, check_ending))
+    {
+        printf("GOODBYE FROM TUANTNT19 's shell\n");
+        break;
+    }
+
     if (c == 1)
     {
         runsinglecommad(command1);
@@ -218,9 +251,10 @@ int main()
     else{
         rundoublecommand(command1, command2);
     }
-    }
-    //runsinglecommad(test);
-    //rundoublecommand(command1, command2);
-   
-    return 0;
+
+    free_mem_command(command1);
+    free_mem_command(command2);
+}
+
+   return 0;
 }

@@ -71,7 +71,7 @@ void execArgs(char** parsed)
 	} else { 
 		// waiting for child to terminate 
 		wait(NULL); 
-		printf("wait p1\n");
+		
 		return; 
 	} 
 } 
