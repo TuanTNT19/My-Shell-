@@ -63,7 +63,11 @@ void runsinglecommad(char *str[])
     {
         if (child_pid == 0)
         {
-            execvp(str[0], str); //str[0]: Name of run file ; str :  array of strings representing the command-line arguments of the new program, where the last element must be a NULL pointer.
+            if (execvp(str[0], str) < 0) //str[0]: Name of run file ; str :  array of strings representing the command-line arguments of the new program, where the last element must be a NULL pointer.
+            {
+                printf("ERROR: Can not run command\n");
+                return ;
+            }
             exit(0);
         }
         else if (child_pid > 0)
@@ -192,15 +196,23 @@ int process_input(char *input, char **command1, char **command2)
     if (check)//if input is double command
     {
         process_singlecommand(str[0], command1);
-        process_singlecommand(str[1], command2);
-        return 2;
+        process_singlecommand(str[1], command2);      
     }
 
     else//if input is single command
     {
         process_singlecommand(str[0], command1);
-        return 1;
 
+    }
+
+    if (strcmp(command1[0], "cd")  == 0)
+    {
+        chdir(command1[1]);
+        return 0;
+    }
+
+    else{
+        return (check+1);
     }
 
 }
@@ -248,7 +260,8 @@ int main()
     {
         runsinglecommad(command1);
     }
-    else{
+    else if (c == 2)
+    {
         rundoublecommand(command1, command2);
     }
 
