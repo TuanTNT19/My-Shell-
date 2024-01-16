@@ -1,33 +1,25 @@
-Created by TuanTNT19
+# Created by TuanTNT19
 
 
-Shell is simulated a real shell in Linux with some basic function. A user can type some command amd run it in this shell like real shell.
+## Shell Simulation
 
+This shell simulates a real shell in Linux with some basic functions. Users can type commands and run them in this shell, similar to a real Linux shell.
 
-* Directories Structure:
+## Directories Structure
 
-bin : Directory for the exe file
+- `bin`: Directory for the executable files
+- `obj`: Directory for the object files
+- `inc`: Directory for the header files
+- `src`: Directory for the source files
+- `lib`: Directory for the static and shared libraries
 
-obj : Directory for the object files
+## Code Usage
 
-inc : Directory for the header files
+- `make all`: Build the runnable file
+- `make mk_obj`: Build object files
+- `make clean`: Clean files in `obj` and `bin`
 
-src : Directory for the sources files
+**Note:** Before running the program, you need to install the readline library using the following command:
 
-lib : Directory for the static and Share lib
-
-
-* Code usage:
-
-make all: build runfile
-
-make mk_obj: build object file
-
-make clean: clean file in obj, bin
-
-
-*Note : Before run program, you need to install readline library by using this command : sudo apt-get install librwadline-devt
-
-
-
-
+```bash
+sudo apt-get install libreadline-dev
