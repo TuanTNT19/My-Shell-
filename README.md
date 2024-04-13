@@ -19,10 +19,10 @@ This shell simulates a real shell in Linux with some basic functions. Users can 
 - `make mk_obj`: Build object files
 - `make clean`: Clean files in `obj` and `bin`
 
+## Video Demo
+[Watch the video demo](https://youtu.be/KW3W2tVfhLA)
+
 **Note:** Before running the program, you need to install the readline library using the following command:
 
 ```bash
 sudo apt-get install libreadline-dev
-
-## Video Demo
-[Watch the video demo](https://youtu.be/KW3W2tVfhLA)
