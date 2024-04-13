@@ -23,3 +23,6 @@ This shell simulates a real shell in Linux with some basic functions. Users can 
 
 ```bash
 sudo apt-get install libreadline-dev
+
+## Video Demo
+[Watch the video demo](https://youtu.be/KW3W2tVfhLA)
