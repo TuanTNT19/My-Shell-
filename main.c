@@ -48,6 +48,8 @@ int takeInput(char* str)
 //Display current Dictory
 void printfCurDir()
 {
+    // char *dir;
+    // dir = getenv("PATH");
     char dir[1000];
     getcwd(dir, sizeof(dir));
     printf("Current_Dictory: %s ",dir);
@@ -84,7 +86,7 @@ void runsinglecommad(char *str[])
 }
 
 //Function to run double command
-void rundoublecommand(char **command1, char **command2)
+void rundoublecommand(char *command1[], char *command2[])
 {
     pid_t pid1, pid2;
     int fds[2];
@@ -149,7 +151,7 @@ void rundoublecommand(char **command1, char **command2)
 }
 
 //function to process string double command
-int process_doublecommand(char *command, char **str)
+int process_doublecommand(char *command, char *str[])
 {
     int i = 0;
     char *token = strtok(command, "|");
@@ -172,7 +174,7 @@ int process_doublecommand(char *command, char **str)
 }
 
 //function to process strong single command
-void process_singlecommand(char *command, char **str)
+void process_singlecommand(char *command, char *str[])
 {
     int i = 0;
     char *token = strtok(command, " ");
@@ -186,7 +188,7 @@ void process_singlecommand(char *command, char **str)
 }
 
 //process input to command1 and command2
-int process_input(char *input, char **command1, char **command2)
+int process_input(char *input, char *command1[], char *command2[])
 {
     int check ;
     char *str[2];
@@ -230,7 +232,7 @@ int ending(char *str1, char *str_check)
 }
 
 //Clear memory for string command
-void free_mem_command(char **command)
+void free_mem_command(char *command[])
 {
     for (int i=0; i<100; i++)
     {
